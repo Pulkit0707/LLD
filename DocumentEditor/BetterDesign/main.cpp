@@ -54,12 +54,8 @@ class Document{
     void addElement(DocumentElement* element){
         elements.push_back(element);
     }
-    string render(){
-        string result;
-        for(auto element: elements){
-            result += element->render() + "\n";
-        }
-        return result;
+    vector<DocumentElement*> getElements(){
+        return elements;
     }
 };
 
@@ -79,10 +75,21 @@ class DocumentEditor{
         document->addElement(new ImageElement(path));
     }
     string renderDocument(){
-        return document->render();
+        return DocumentRenderer().render(document);
     }
     void saveDocument(){
         saver->save();
+    }
+};
+
+class DocumentRenderer{
+    public:
+    string render(Document* doc){
+        vector<DocumentElement*> elements = doc->getElements();
+        string result;
+        for(auto element: elements){
+            result += element->render() + "\n";
+        }
     }
 };
 
