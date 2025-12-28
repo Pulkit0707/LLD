@@ -68,6 +68,10 @@ class DocumentEditor{
     Document* document;
     Save* saver;
     public:
+    DocumentEditor(Document*doc, Save* s){
+        document = doc;
+        saver = s;
+    }
     void addText(string txt){
         document->addElement(new TextElement(txt));
     }
