@@ -87,5 +87,13 @@ class DocumentEditor{
 };
 
 int main(){
+    Document*doc = new Document();
+    Save* saver = new SaveToFile();
+    DocumentEditor editor(doc, saver);
+
+    editor.addText("Hello, World!");
+    editor.addImage("image.png");   
+    cout << editor.renderDocument();
+    editor.saveDocument();
     return 0;
 }
