@@ -4,23 +4,16 @@ using namespace std;
 
 class Singleton{
     static Singleton* instance;
-    static mutex mtx;
     Singleton(){
-        cout<<"New singleton object";
+        cout<<"Singleton Instance Created"<<endl;
     }
     public:
     static Singleton*getInstance(){
-        if(instance==nullptr){
-            lock_guard<mutex> lock(mtx);
-            if(instance==nullptr){
-                instance=new Singleton();
-            }
-        }
         return instance;
     }
 };
 
-Singleton* Singleton::instance=nullptr;
+Singleton* Singleton::instance=new Singleton();
 
 int main(){
     Singleton* s1=Singleton::getInstance();
