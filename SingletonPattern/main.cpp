@@ -1,20 +1,22 @@
 #include <bits/stdc++.h>
+#include <mutex>
 using namespace std;
 
 class Singleton{
     static Singleton* instance;
+    static mutex mtx;
     Singleton(){
         cout<<"New singleton object";
     }
     public:
     static Singleton*getInstance(){
         if(instance==nullptr){
-            instance=new Singleton();
-            return instance;
+            lock_guard<mutex> lock(mtx);
+            if(instance==nullptr){
+                instance=new Singleton();
+            }
         }
-        else{
-            return instance;
-        }
+        return instance;
     }
 };
 
