@@ -20,6 +20,14 @@ class Order{
     Order(const User& u, Restraunt* res, const vector<MenuItem>& its, PaymentStrategy* ps)
         : user(u), r(res), items(its), strategy(ps), id(nextOrderId++) {}
     virtual int getType()=0;
+    bool processPayment(){
+        double amount=0;
+        for(auto& item:items){
+            amount+=item.getPrice();
+        }
+        strategy->pay(amount);
+        return true;
+    }
 };
 
 int Order::nextOrderId = 1;
