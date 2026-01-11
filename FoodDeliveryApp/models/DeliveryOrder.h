@@ -14,6 +14,12 @@ class DeliveryOrder:public Order{
     int getType() override {
         return 1; // 1 indicates Delivery Order
     }
+    string getDeliveryAddress() const {
+        return deliveryAddress;
+    }
+    void setDeliveryAddress(const string& addr) {
+        deliveryAddress = addr;
+    }
 };
 
 #endif // DELIVERY_ORDER_H

@@ -14,6 +14,12 @@ class PickupOrder:public Order{
     int getType() override {
         return 2; // 2 indicates Pickup Order
     }
+    string getResAddress() const {
+        return resAddress;
+    }
+    void setResAddress(const string& addr) {
+        resAddress = addr;
+    }
 };
 
 #endif // PICKUP_ORDER_H
