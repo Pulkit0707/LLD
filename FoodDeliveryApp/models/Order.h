@@ -28,6 +28,12 @@ class Order{
         strategy->pay(amount);
         return true;
     }
+    Restraunt*getRestraunt(){
+        return r;
+    }
+    vector<MenuItem> getItems(){
+        return items;
+    }
 };
 
 int Order::nextOrderId = 1;
