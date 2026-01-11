@@ -24,7 +24,7 @@ class User{
     string getAddress() const {
         return address;
     }
-    Cart& getCart() {
+    Cart getCart() {
         return cart;
     }
 };

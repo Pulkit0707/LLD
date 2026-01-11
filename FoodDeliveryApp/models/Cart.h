@@ -24,6 +24,12 @@ class Cart{
     bool isEmpty(){
         return items.size()==0;
     }
+    void setRestraunt(Restraunt* restraunt){
+        r=restraunt;
+    }
+    Restraunt getRestraunt(){
+        return *r;
+    }
 };
 
 #endif // CART_H

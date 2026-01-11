@@ -18,6 +18,9 @@ class Restraunt{
     ~Restraunt() {
         menu.clear();
     }
+    void addMenuItem(MenuItem item){
+        menu.push_back(item);
+    }
     string getName() const {
         return name;
     }
