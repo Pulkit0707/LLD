@@ -13,7 +13,10 @@ class IColleague{
     IMediator*mediator;
     public:
     string name;
-    IColleague(IMediator*mediator):mediator(mediator){}
+    IColleague(IMediator*mediator){
+        mediator=mediator;
+        mediator->registerColleague(this);
+    }
     virtual void sendAll(string msg)=0;
     virtual void sendTo(string to,string msg)=0;
     virtual void receive(string from,string msg)=0;
