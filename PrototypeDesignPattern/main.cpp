@@ -22,6 +22,15 @@ class NPC:public Clonable{
         power=npc.power;
         cout<<"Cloning NPC"<<name<<endl;
     }
+    void setName(string n){
+        name=n;
+    }
+    void setPower(int p){
+        power=p;
+    }
+    void setHealth(int h){
+        health=h;
+    }
     Clonable*clone() override{
         return new NPC(*this);
     }
