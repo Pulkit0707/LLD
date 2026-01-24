@@ -70,5 +70,18 @@ class Caretaker{
 };
 
 int main(){
+    Originator o;
+    Caretaker c;
+    c.beginTxn(&o);
+    o.create("name","Alice");
+    o.create("age","30");
+    c.commit();
+    o.display();
+    c.beginTxn(&o);
+    o.update("name","Bob");
+    o.update("age","31");
+    o.display();
+    c.rollback(&o);
+    o.display();
     return 0;
 }
