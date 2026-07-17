@@ -1,86 +1,171 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+//================ Coupon ===================
+
 class Coupon{
-    public:
-    virtual void applyDiscount()=0;
+public:
+    virtual int applyDiscount(int amount)=0;
     virtual ~Coupon()=default;
 };
 
 class PercentageCoupon : public Coupon{
+
     int percentage;
-    public:
+
+public:
+
     PercentageCoupon(int percentage):percentage(percentage){}
-    void applyDiscount() override{
+
+    int applyDiscount(int amount) override{
+
         cout<<"Applying "<<percentage<<"% discount"<<endl;
+
+        return amount-(amount*percentage)/100;
     }
 };
 
 class FixedAmountCoupon : public Coupon{
-    int amount;
-    public:
-    FixedAmountCoupon(int amount):amount(amount){}
-    void applyDiscount() override{
-        cout<<"Applying fixed discount of "<<amount<<endl;
+
+    int discount;
+
+public:
+
+    FixedAmountCoupon(int discount):discount(discount){}
+
+    int applyDiscount(int amount) override{
+
+        cout<<"Applying fixed discount of "<<discount<<endl;
+
+        return amount-discount;
     }
 };
 
+//================ Factory ===================
+
 class CouponFactory{
-    public:
-    static Coupon*getCoupon(string couponType,int value){
-        if(couponType=="percentage"){
+
+public:
+
+    static Coupon* getCoupon(string couponType,int value){
+
+        if(couponType=="percentage")
             return new PercentageCoupon(value);
-        }
-        if(couponType=="amount"){
+
+        if(couponType=="amount")
             return new FixedAmountCoupon(value);
-        }
+
         return nullptr;
     }
 };
 
+//================ Strategy ===================
+
 class CouponStrategy{
-    public:
+
+public:
+
     virtual void greeting()=0;
+
     virtual ~CouponStrategy()=default;
 };
 
-class SeasonalCoupon:public CouponStrategy{
+class SeasonalCoupon : public CouponStrategy{
+
     string season;
-    public:
+
+public:
+
     SeasonalCoupon(string season):season(season){}
+
     void greeting() override{
-        cout<<"Discount for the season "<<season<<endl;
+
+        cout<<"Seasonal Offer : "<<season<<endl;
     }
 };
 
-class FestivalCoupon:public CouponStrategy{
+class FestivalCoupon : public CouponStrategy{
+
     string festival;
-    public:
+
+public:
+
     FestivalCoupon(string festival):festival(festival){}
+
     void greeting() override{
-        cout<<"Discount for the festival "<<festival<<endl;
+
+        cout<<"Festival Offer : "<<festival<<endl;
     }
 };
 
-class CouponContext: public CouponStrategy, public CouponFactory{
-    CouponStrategy* couponType;
-    CouponFactory* discountType;
+//================ Context ===================
+
+class CouponContext{
+
+    Coupon* coupon;
+
+    CouponStrategy* strategy;
+
     string name;
-    public:
-    CouponContext(CouponStrategy* couponType, CouponFactory* discountType, string name):couponType(couponType),discountType(discountType),name(name){}
+
+public:
+
+    CouponContext(Coupon* coupon,
+                  CouponStrategy* strategy,
+                  string name)
+        :coupon(coupon),
+         strategy(strategy),
+         name(name){}
+
+    int applyCoupon(int amount){
+
+        cout<<"Coupon Name : "<<name<<endl;
+
+        strategy->greeting();
+
+        return coupon->applyDiscount(amount);
+    }
 };
+
+//================ Service ===================
 
 class CouponService{
+
     int amount;
+
     CouponContext* coupon;
-    public:
-    CouponService(int amount,CouponContext* coupon):amount(amount),coupon(coupon){}
+
+public:
+
+    CouponService(int amount,
+                  CouponContext* coupon)
+        :amount(amount),
+         coupon(coupon){}
+
     void applyCoupon(){
-        coupon->getCoupon();
-        coupon->greeting();
+
+        int finalAmount=coupon->applyCoupon(amount);
+
+        cout<<"Original Amount : "<<amount<<endl;
+
+        cout<<"Final Amount : "<<finalAmount<<endl;
     }
 };
+
+//================ Main ===================
 
 int main(){
 
+    Coupon* c1=CouponFactory::getCoupon("percentage",20);
+
+    CouponStrategy* s1=new FestivalCoupon("Diwali");
+
+    CouponContext* context=
+        new CouponContext(c1,s1,"DIWALI20");
+
+    CouponService service(1000,context);
+
+    service.applyCoupon();
+
+    return 0;
 }
