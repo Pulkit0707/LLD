@@ -1,9 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-//====================================================
+//==================================================
 // Product
-//====================================================
+//==================================================
 
 class Product {
 public:
@@ -17,24 +17,20 @@ public:
         : name(name), price(price), desc(desc) {}
 
     void show() {
-        cout << "Name : " << name << endl;
-        cout << "Price : " << price << endl;
-        cout << "Description : " << desc << endl;
+        cout << name << " | " << price << " | " << desc << endl;
     }
 };
 
-//====================================================
+//==================================================
 // Builder
-//====================================================
+//==================================================
 
 class ProductBuilder {
-
     string name;
     int price;
     string desc;
 
 public:
-
     ProductBuilder& setName(string name) {
         this->name = name;
         return *this;
@@ -55,9 +51,9 @@ public:
     }
 };
 
-//====================================================
+//==================================================
 // Store
-//====================================================
+//==================================================
 
 class Store {
 
@@ -65,63 +61,55 @@ class Store {
 
 public:
 
-    void addProduct(Product product,int quantity) {
-
-        inventory[product.name] = {product,quantity};
+    void addProduct(Product product,int quantity){
+        inventory[product.name]={product,quantity};
     }
 
-    int getStock(string productName) {
-
-        return inventory[productName].second;
+    int getStock(string name){
+        return inventory[name].second;
     }
 
-    void reduceStock(string productName,int quantity) {
-
-        inventory[productName].second -= quantity;
-    }
-
-    Product getProduct(string productName) {
-
-        return inventory[productName].first;
+    void reduceStock(string name,int quantity){
+        inventory[name].second-=quantity;
     }
 };
 
-//====================================================
+//==================================================
 // Cart
-//====================================================
+//==================================================
 
-class Cart {
+class Cart{
 
     unordered_map<string,int> products;
 
 public:
 
-    void addProduct(Product product) {
-
+    void addProduct(Product product){
         products[product.name]++;
     }
 
-    unordered_map<string,int> getProducts() {
-
+    unordered_map<string,int> getProducts(){
         return products;
     }
 };
 
-//====================================================
+//==================================================
 // Forward Declaration
-//====================================================
+//==================================================
 
 class Order;
 
-//====================================================
-// State
-//====================================================
+//==================================================
+// State Pattern
+//==================================================
 
-class OrderState {
+class OrderState{
 
 public:
 
-    virtual void track(Order* order)=0;
+    virtual void track()=0;
+
+    virtual void next(Order* order)=0;
 
     virtual ~OrderState()=default;
 };
@@ -134,114 +122,141 @@ extern PackagingState packaging;
 extern PickedUpState pickedUp;
 extern DeliveredState delivered;
 
-//====================================================
+//==================================================
 // Order
-//====================================================
+//==================================================
 
-class Order {
+class Order{
 
     OrderState* state;
 
-    unordered_map<string,int> products;
-
     Store* store;
+
+    unordered_map<string,int> products;
 
 public:
 
     Order(Store* store)
-        : state(nullptr),
-          store(store) {}
+        : store(store),state(nullptr){}
 
-    void setState(OrderState* state) {
-
-        this->state = state;
+    void setState(OrderState* state){
+        this->state=state;
     }
 
-    void placeOrder(Cart& cart) {
+    void placeOrder(Cart& cart){
 
-        products = cart.getProducts();
+        products=cart.getProducts();
 
-        for(auto product : products){
+        for(auto product:products){
 
-            if(store->getStock(product.first) < product.second){
-
-                throw runtime_error(
-                    "Insufficient Stock for " + product.first);
+            if(store->getStock(product.first)<product.second){
+                throw runtime_error("Insufficient Stock");
             }
 
-            store->reduceStock(product.first,
-                               product.second);
+            store->reduceStock(product.first,product.second);
         }
 
         cout<<"Order Placed Successfully\n";
 
-        setState((OrderState*)&packaging);
+        setState(&packaging);
     }
 
-    void track() {
+    void track(){
 
-        state->track(this);
+        state->track();
+    }
+
+    void updateStatus(){
+
+        state->next(this);
     }
 };
 
-//====================================================
-// States
-//====================================================
+//==================================================
+// Packaging State
+//==================================================
 
-class PackagingState : public OrderState {
+class PackagingState : public OrderState{
 
 public:
 
-    void track(Order* order) override {
+    void track() override{
 
-        cout<<"Packaging Order...\n";
+        cout<<"Current Status : Packaging\n";
+    }
 
-        order->setState((OrderState*)&pickedUp);
+    void next(Order* order) override{
+
+        cout<<"Packaging Finished\n";
+
+        order->setState(&pickedUp);
     }
 };
 
-class PickedUpState : public OrderState {
+//==================================================
+// Picked Up State
+//==================================================
+
+class PickedUpState : public OrderState{
 
 public:
 
-    void track(Order* order) override {
+    void track() override{
 
-        cout<<"Order Picked Up\n";
+        cout<<"Current Status : Picked Up\n";
+    }
 
-        order->setState((OrderState*)&delivered);
+    void next(Order* order) override{
+
+        cout<<"Order Picked By Delivery Partner\n";
+
+        order->setState(&delivered);
     }
 };
 
-class DeliveredState : public OrderState {
+//==================================================
+// Delivered State
+//==================================================
+
+class DeliveredState : public OrderState{
 
 public:
 
-    void track(Order*) override {
+    void track() override{
 
-        cout<<"Order Delivered\n";
+        cout<<"Current Status : Delivered\n";
+    }
+
+    void next(Order*) override{
+
+        cout<<"Already Delivered\n";
     }
 };
+
+//==================================================
+// Global State Objects
+//==================================================
 
 PackagingState packaging;
 PickedUpState pickedUp;
 DeliveredState delivered;
 
-//====================================================
+//==================================================
 // Order Service
-//====================================================
+//==================================================
 
-class OrderService {
+class OrderService{
 
     Store* store;
 
 public:
 
     OrderService(Store* store)
-        : store(store) {}
+        : store(store){}
 
     Order* createOrder(Cart& cart){
 
-        Order* order = new Order(store);
+        Order* order=new Order(store);
 
         order->placeOrder(cart);
 
@@ -249,20 +264,20 @@ public:
     }
 };
 
-//====================================================
+//==================================================
 // Main
-//====================================================
+//==================================================
 
 int main(){
 
-    Product apple =
+    Product apple=
         ProductBuilder()
         .setName("Apple")
         .setPrice(100)
         .setDesc("Fresh Apples")
         .build();
 
-    Product milk =
+    Product milk=
         ProductBuilder()
         .setName("Milk")
         .setPrice(60)
@@ -279,17 +294,27 @@ int main(){
     cart.addProduct(apple);
     cart.addProduct(milk);
 
-    OrderService orderService(&store);
+    OrderService service(&store);
 
-    Order* order = orderService.createOrder(cart);
+    Order* order=service.createOrder(cart);
 
-    cout << endl;
-
-    order->track();
+    cout<<"\n";
 
     order->track();
 
+    cout<<"\n";
+
+    order->updateStatus();
+
     order->track();
 
-    return 0;
+    cout<<"\n";
+
+    order->updateStatus();
+
+    order->track();
+
+    cout<<"\n";
+
+    order->updateStatus();
 }
